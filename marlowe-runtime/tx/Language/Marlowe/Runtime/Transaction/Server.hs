@@ -38,7 +38,6 @@ import Control.Concurrent.Component
 import Control.Concurrent.STM (STM, atomically, modifyTVar, newEmptyTMVar, newTVar, putTMVar, readTMVar, readTVar)
 import Control.Error.Util (hoistMaybe, note, noteT)
 import Control.Exception (Exception(..))
-import Control.Monad (when)
 import Control.Monad.IO.Class (MonadIO(liftIO))
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Except (ExceptT(..), except, runExceptT, withExceptT)
@@ -94,7 +93,6 @@ import Network.Protocol.Job.Server
   (JobServer(..), ServerStAttach(..), ServerStAwait(..), ServerStCmd(..), ServerStInit(..), hoistAttach, hoistCmd)
 import Observe.Event (Event, EventBackend, addField, subEventBackend, withEvent, withSubEvent)
 import Ouroboros.Consensus.BlockchainTime (SystemStart)
-import System.Exit (die)
 
 data TransactionServerSelector f where
   Exec :: TransactionServerSelector ExecField
@@ -169,8 +167,6 @@ worker = component_ \WorkerDependencies{..} -> do
           addField ev $ ProtocolParameters protocolParameters
           networkId <- liftIO $ queryChainSync GetNetworkId
           addField ev $ NetworkId networkId
-          liftIO $ when (networkId == Mainnet) do
-            die "Mainnet support is currently disabled."
           let
             solveConstraints :: Constraints.SolveConstraints
             solveConstraints =
